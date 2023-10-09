@@ -9,7 +9,7 @@ name = "matrix.mp4"
 fullname = path + name
 winname = name[0:-4]
 
-queue = []
+queue = []  # 큐
 
 # 영상 불러오기
 cap1 = cv.VideoCapture(fullname)
@@ -44,7 +44,7 @@ font_thickness = 2  # 폰트 두께
 brightness = 10.0
 
 
-def callback_brightness(x):
+def callback_brightness(x):  # 밝기 관련 변수 조절
     global brightness
     if x >= 10:
         brightness = 4 ** (x / 10.0) - 3
@@ -72,12 +72,15 @@ if cap1.isOpened() and cap2.isOpened():
 
         # 이미지에 텍스트 추가
 
-        text_frame1 = cv.putText(frame1, "org_index=" + str(int(cap1.get(cv.CAP_PROP_POS_FRAMES))), text_pos, font,
+        text_frame1 = cv.putText(frame1, "org_index=" + str(int(cap1.get(cv.CAP_PROP_POS_FRAMES))),
+                                 text_pos, font,
                                  font_scale, font_color,
                                  font_thickness)
         text_frame2 = cv.putText(scaled_frame, "this_index=" + str(count), text_pos, font, font_scale,
                                  font_color, font_thickness)
         count += 1
+
+        runtime = time.time() - s_time  # 재생 시간
 
         # 프레임 합쳐서 윈도우에 띄우기
         merged_frame = cv.hconcat([text_frame1, text_frame2])
@@ -90,6 +93,8 @@ if cap1.isOpened() and cap2.isOpened():
             for sf in queue:
                 out.write(sf)  # 프레임 저장
             time.sleep(0.1)
+            print("재생을 종료합니다.")
+            print(f"run time = {runtime:#.2f}sec")  # 종료 시 재생시간 출력
             sys.exit()
         elif key == 32:
             while True:
@@ -101,6 +106,8 @@ if cap1.isOpened() and cap2.isOpened():
                     for sf in queue:
                         out.write(sf)  # 프레임 저장
                     time.sleep(0.1)
+                    print("재생을 종료합니다.")
+                    print(f"run time = {runtime:#.2f}sec")
                     sys.exit()
                 time.sleep(0.000001)
 
@@ -113,8 +120,7 @@ if cap1.isOpened() and cap2.isOpened():
 
     # 원래 동영상의 시간과 실제 재생시간의 차이 출력
     print("total playtime = 44sec")
-    runtime = time.time() - s_time
-    print(f"run time = {runtime}sec")
+    print(f"run time = {runtime:#.2f}sec")
 
 else:  # 비디오를 못찾으면 강제종료
     print("Error : video not found")
